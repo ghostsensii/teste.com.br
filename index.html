@@ -1,0 +1,1839 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghost Sensi</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="logo.png">
+
+    <!-- Apple Touch Icon (iOS) -->
+    <link rel="apple-touch-icon" href="logo.png">
+
+    <!-- Android/Chrome -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#ff66c4">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
+            color: #333;
+            width: 100%;
+            max-width: 100vw;
+            margin: 0;
+            padding: 24px 20px;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .app-name {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .app-logo {
+            width: 120px;
+            height: auto;
+            /* Static shadow is more performant than animating filters */
+            filter: drop-shadow(0 0 15px rgba(255, 102, 196, 0.5));
+            animation: logoPulse 4s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.9;
+            }
+
+            50% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: #888;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #222;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 3px;
+            height: 16px;
+            background: linear-gradient(180deg, #ff66c4, #ff99d6);
+            border-radius: 2px;
+            margin-right: 12px;
+        }
+
+        /* Icons */
+        .icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Platform Selection */
+        .platform-selector {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .platform-btn {
+            flex: 1;
+            padding: 16px;
+            border: 2px solid rgba(0, 0, 0, 0.06);
+            border-radius: 14px;
+            background: rgba(250, 250, 250, 0.9);
+            font-size: 14px;
+            font-weight: 700;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .platform-btn:hover {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(255, 102, 196, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .platform-btn.active {
+            background: linear-gradient(135deg, #ff66c4, #ff88d4);
+            color: white;
+            border-color: #ff66c4;
+            box-shadow: 0 4px 12px rgba(255, 102, 196, 0.25);
+        }
+
+        .platform-note {
+            font-size: 11px;
+            color: #999;
+            padding: 12px;
+            background: rgba(249, 249, 249, 0.8);
+            border-radius: 10px;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        /* Player Grid */
+        .player-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 4px;
+        }
+
+        .player-grid::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .player-grid::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 3px;
+        }
+
+        .player-grid::-webkit-scrollbar-thumb {
+            background: rgba(255, 102, 196, 0.3);
+            border-radius: 3px;
+        }
+
+        .player-card {
+            padding: 14px 10px;
+            background: rgba(250, 250, 250, 0.9);
+            border: 2px solid rgba(0, 0, 0, 0.04);
+            border-radius: 12px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .player-card:hover {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(255, 102, 196, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .player-card.selected {
+            background: rgba(255, 240, 248, 1);
+            border-color: #ff66c4;
+            color: #ff66c4;
+            box-shadow: 0 4px 12px rgba(255, 102, 196, 0.15);
+        }
+
+        /* Profile Options */
+        .profile-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .profile-option {
+            padding: 16px 18px;
+            background: rgba(250, 250, 250, 0.6);
+            backdrop-filter: blur(8px);
+            border: 2px solid rgba(0, 0, 0, 0.04);
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #666;
+            cursor: pointer;
+            transition: background 0.3s, border-color 0.3s, transform 0.2s, box-shadow 0.3s, color 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+
+        .profile-option:hover {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(255, 102, 196, 0.2);
+            transform: translateX(4px);
+        }
+
+        .profile-option.selected {
+            background: linear-gradient(135deg, rgba(255, 240, 248, 0.9), rgba(255, 255, 255, 0.9));
+            backdrop-filter: blur(12px);
+            border-color: #ff66c4;
+            color: #ff66c4;
+            box-shadow: 0 4px 12px rgba(255, 102, 196, 0.2);
+        }
+
+        .profile-range {
+            font-size: 11px;
+            color: #999;
+            font-weight: 600;
+        }
+
+        .profile-option.selected .profile-range {
+            color: #ff88d4;
+        }
+
+        /* Sensitivity Bars */
+        .sensi-bar {
+            margin-bottom: 18px;
+        }
+
+        .sensi-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .sensi-name {
+            font-weight: 700;
+            color: #444;
+            letter-spacing: 0.3px;
+        }
+
+        .sensi-value {
+            font-weight: 800;
+            color: #ff66c4;
+            font-size: 14px;
+        }
+
+        .bar-container {
+            width: 100%;
+            height: 10px;
+            background: rgba(240, 240, 240, 0.9);
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff66c4, #ff99d6);
+            border-radius: 5px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 8px rgba(255, 102, 196, 0.4);
+        }
+
+        /* DPI Display */
+        .dpi-display {
+            text-align: center;
+            padding: 28px 24px;
+            background: linear-gradient(135deg, rgba(255, 240, 248, 0.5), rgba(255, 255, 255, 0.5));
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            border: 2px solid #ff66c4;
+            box-shadow: 0 4px 16px rgba(255, 102, 196, 0.15);
+        }
+
+        .dpi-label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .dpi-value {
+            font-size: 42px;
+            font-weight: 900;
+            color: #ff66c4;
+            letter-spacing: -1px;
+        }
+
+        /* FPS Status */
+        .fps-status {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            background: rgba(249, 249, 249, 0.6);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.03);
+        }
+
+        .status-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #555;
+            letter-spacing: 0.3px;
+        }
+
+        .status-badge {
+            padding: 6px 14px;
+            background: linear-gradient(135deg, #e8f9f0, #f0fdf4);
+            color: #00c853;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            border: 1px solid rgba(0, 200, 83, 0.1);
+        }
+
+        .status-badge.pending {
+            background: linear-gradient(135deg, #fff3e0, #fffbf0);
+            color: #ff9800;
+            border-color: rgba(255, 152, 0, 0.1);
+        }
+
+        /* FPS Optimizer Button */
+        .fps-optimize-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, rgba(255, 102, 196, 0.1), rgba(255, 152, 196, 0.1));
+            backdrop-filter: blur(8px);
+            border: 2px solid #ff66c4;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #ff66c4;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .fps-optimize-btn:hover {
+            background: linear-gradient(135deg, #ff66c4, #ff88d4);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 102, 196, 0.3);
+        }
+
+        .fps-optimize-btn:active {
+            transform: translateY(0);
+        }
+
+        /* FPS Selector Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 24px;
+            padding: 28px 24px;
+            max-width: 360px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #222;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .modal-subtitle {
+            font-size: 13px;
+            color: #888;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .fps-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .fps-option {
+            padding: 16px 12px;
+            background: rgba(250, 250, 250, 0.8);
+            backdrop-filter: blur(8px);
+            border: 2px solid rgba(0, 0, 0, 0.06);
+            border-radius: 12px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 800;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .fps-option:hover {
+            background: rgba(255, 255, 255, 1);
+            border-color: rgba(255, 102, 196, 0.3);
+            transform: scale(1.05);
+        }
+
+        .fps-option.selected {
+            background: linear-gradient(135deg, #ff66c4, #ff88d4);
+            color: white;
+            border-color: #ff66c4;
+            box-shadow: 0 4px 12px rgba(255, 102, 196, 0.3);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modal-btn.cancel {
+            background: rgba(240, 240, 240, 0.8);
+            color: #666;
+        }
+
+        .modal-btn.cancel:hover {
+            background: rgba(220, 220, 220, 1);
+        }
+
+        .modal-btn.confirm {
+            background: linear-gradient(135deg, #ff66c4, #ff88d4);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 102, 196, 0.3);
+        }
+
+        .modal-btn.confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 102, 196, 0.4);
+        }
+
+        /* Permission Modal */
+        .permission-content {
+            text-align: center;
+        }
+
+        .permission-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 20px;
+            stroke: #ff66c4;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .permission-text {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        /* Main Button */
+        .main-button {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #ff66c4, #ff88d4);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            margin: 28px 0;
+            box-shadow: 0 6px 20px rgba(255, 102, 196, 0.35);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .main-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 102, 196, 0.45);
+        }
+
+        .main-button:active {
+            transform: translateY(0);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 24px 20px;
+            font-size: 11px;
+            color: #aaa;
+            font-style: italic;
+        }
+
+        .read-only-note {
+            font-size: 11px;
+            color: #999;
+            text-align: center;
+            margin-top: 12px;
+            font-style: italic;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .info-icon {
+            width: 14px;
+            height: 14px;
+            stroke: #999;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        /* Locked State */
+        .locked {
+            opacity: 0.6;
+            cursor: not-allowed !important;
+            pointer-events: none;
+            filter: grayscale(0.5);
+        }
+
+        .locked-badge {
+            background: #ff4d4d;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        /* Success Toast */
+        .success-toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(255, 102, 196, 0.2);
+            border: 2px solid #ff66c4;
+            color: #ff66c4;
+            font-weight: 800;
+            font-size: 16px;
+            z-index: 2100;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .success-toast.active {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast-icon {
+            width: 24px;
+            height: 24px;
+            stroke: #ff66c4;
+            fill: none;
+            stroke-width: 3;
+        }
+
+        /* Menu Button */
+        .menu-button {
+            position: fixed;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #ff66c4, #ff88d4);
+            border: none;
+            border-radius: 50%;
+            cursor: move;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 20px rgba(255, 102, 196, 0.4);
+            z-index: 999;
+            transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            touch-action: none;
+            user-select: none;
+            will-change: transform;
+        }
+
+        .menu-button:active {
+            box-shadow: 0 8px 24px rgba(255, 102, 196, 0.5);
+        }
+
+        .menu-button.dragging {
+            transition: none;
+            box-shadow: 0 10px 30px rgba(255, 102, 196, 0.6);
+        }
+
+        .menu-button svg {
+            width: 24px;
+            height: 24px;
+            stroke: white;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Side Menu */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 320px;
+            max-width: 85vw;
+            height: 100vh;
+            background: white;
+            box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+            z-index: 1001;
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+        }
+
+        .side-menu.active {
+            right: 0;
+        }
+
+        .menu-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #fff0f8, #ffffff);
+        }
+
+        .menu-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #ff66c4;
+        }
+
+        .menu-close {
+            width: 36px;
+            height: 36px;
+            background: rgba(0, 0, 0, 0.05);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .menu-close:hover {
+            background: rgba(255, 102, 196, 0.1);
+        }
+
+        .menu-close svg {
+            width: 20px;
+            height: 20px;
+            stroke: #666;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+        }
+
+        .menu-content {
+            padding: 20px;
+        }
+
+        .menu-item {
+            padding: 18px;
+            background: rgba(250, 250, 250, 0.6);
+            backdrop-filter: blur(8px);
+            border: 2px solid rgba(0, 0, 0, 0.04);
+            border-radius: 14px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(255, 102, 196, 0.3);
+            transform: translateX(-4px);
+        }
+
+        .menu-item svg {
+            width: 22px;
+            height: 22px;
+            stroke: #ff66c4;
+            fill: none;
+            stroke-width: 2;
+            flex-shrink: 0;
+        }
+
+        .menu-item-content {
+            flex: 1;
+        }
+
+        .menu-item-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .menu-item-desc {
+            font-size: 11px;
+            color: #999;
+            line-height: 1.4;
+        }
+
+        /* Menu Overlay */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            visibility: hidden;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        /* Guide Panel */
+        .guide-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            z-index: 2000;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .guide-panel.active {
+            transform: translateY(0);
+        }
+
+        .guide-header {
+            padding: 24px 20px;
+            background: linear-gradient(135deg, #fff0f8, #ffffff);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .guide-header-content {
+            flex: 1;
+        }
+
+        .guide-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #ff66c4;
+            margin-bottom: 4px;
+        }
+
+        .guide-subtitle {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .guide-close {
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.05);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            margin-left: 12px;
+        }
+
+        .guide-close:hover {
+            background: rgba(255, 102, 196, 0.1);
+        }
+
+        .guide-close svg {
+            width: 22px;
+            height: 22px;
+            stroke: #666;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+        }
+
+        .guide-content {
+            padding: 24px 20px;
+        }
+
+        .tip-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .tip-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .tip-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, rgba(255, 102, 196, 0.1), rgba(255, 152, 196, 0.1));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .tip-icon svg {
+            width: 22px;
+            height: 22px;
+            stroke: #ff66c4;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .tip-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .tip-content {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.7;
+        }
+
+        .tip-highlight {
+            display: inline-block;
+            padding: 2px 8px;
+            background: rgba(255, 102, 196, 0.1);
+            color: #ff66c4;
+            border-radius: 4px;
+            font-weight: 600;
+            margin: 0 2px;
+        }
+
+        .guide-footer {
+            padding: 20px;
+            text-align: center;
+            font-size: 11px;
+            color: #999;
+            font-style: italic;
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            background: rgba(249, 249, 249, 0.5);
+        }
+
+        .menu-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Add Player specific styles */
+        .player-card.add-btn {
+            background: rgba(255, 102, 196, 0.05);
+            border: 2px dashed rgba(255, 102, 196, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            color: #ff66c4;
+        }
+
+        .player-card.add-btn:hover {
+            background: rgba(255, 102, 196, 0.1);
+            border-color: #ff66c4;
+        }
+
+        .player-card.custom {
+            position: relative;
+        }
+
+        .remove-player-btn {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            background: #ff4d4d;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 5;
+            transition: transform 0.2s;
+        }
+
+        .remove-player-btn:hover {
+            transform: scale(1.2);
+        }
+
+        /* FPS Slider Styles */
+        .fps-slider-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .fps-slider-value {
+            font-size: 32px;
+            font-weight: 900;
+            color: #ff66c4;
+            margin-bottom: 10px;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #ff66c4;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 102, 196, 0.4);
+        }
+
+        /* Inputs in Modal */
+        .modal-input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            font-size: 15px;
+            margin-bottom: 20px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .modal-input:focus {
+            border-color: #ff66c4;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Menu Button -->
+    <button class="menu-button" onclick="toggleMenu()">
+        <svg viewBox="0 0 24 24">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+    </button>
+
+    <!-- Menu Overlay -->
+    <div class="menu-overlay" id="menu-overlay" onclick="closeMenu()"></div>
+
+    <!-- Side Menu -->
+    <div class="side-menu" id="side-menu">
+        <div class="menu-header">
+            <div class="menu-title">Menu</div>
+            <button class="menu-close" onclick="closeMenu()">
+                <svg viewBox="0 0 24 24">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="menu-content">
+            <div class="menu-item" onclick="openFPSModal()">
+                <svg viewBox="0 0 24 24" style="stroke: #ff66c4;">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                <div class="menu-item-content">
+                    <div class="menu-item-title">Otimizar FPS</div>
+                    <div class="menu-item-desc">Aumente o desempenho do jogo</div>
+                </div>
+            </div>
+            <div class="menu-item" onclick="openGuidePanel()">
+                <svg viewBox="0 0 24 24" style="stroke: #ff66c4;">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                <div class="menu-item-content">
+                    <div class="menu-item-title">Dicas de Capa</div>
+                    <div class="menu-item-desc">Aprenda técnicas para melhorar headshots</div>
+                </div>
+            </div>
+            <div class="menu-item" onclick="openLibraryModal()">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+                <div class="menu-item-content">
+                    <div class="menu-item-title">Biblioteca</div>
+                    <div class="menu-item-desc">Veja suas sensis salvas</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="app-name">
+            <img src="logo.png" alt="Ghost Sensi" class="app-logo">
+        </div>
+    </div>
+
+    <!-- Platform Selection -->
+    <div class="section">
+        <div class="section-title">Plataforma</div>
+        <div class="platform-selector">
+            <div class="platform-btn active" onclick="selectPlatform(this, 'mobile')">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                    <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                </svg>
+                Mobile
+            </div>
+            <div class="platform-btn" onclick="selectPlatform(this, 'pc')">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+                PC
+            </div>
+        </div>
+        <div class="platform-note">
+            Mobile → gera DPI Mobile | PC → gera Mouse DPI
+        </div>
+    </div>
+
+    <!-- Player Style Selection -->
+    <div class="section">
+        <div class="section-title">Estilo de Jogador</div>
+        <div class="player-grid" id="player-grid">
+            <!-- Rendered via JS -->
+        </div>
+    </div>
+
+    <!-- Generated Sensitivity -->
+    <div class="section">
+        <div class="section-title">Sensibilidade Gerada</div>
+
+        <div class="sensi-bar">
+            <div class="sensi-label">
+                <span class="sensi-name">Sensi Geral</span>
+                <span class="sensi-value" id="sensi-geral">0</span>
+            </div>
+            <div class="bar-container">
+                <div class="bar-fill" id="bar-geral" style="width: 0%;"></div>
+            </div>
+        </div>
+
+        <div class="sensi-bar">
+            <div class="sensi-label">
+                <span class="sensi-name">Red Dot</span>
+                <span class="sensi-value" id="sensi-reddot">0</span>
+            </div>
+            <div class="bar-container">
+                <div class="bar-fill" id="bar-reddot" style="width: 0%;"></div>
+            </div>
+        </div>
+
+        <div class="sensi-bar">
+            <div class="sensi-label">
+                <span class="sensi-name">Mira 2x</span>
+                <span class="sensi-value" id="sensi-2x">0</span>
+            </div>
+            <div class="bar-container">
+                <div class="bar-fill" id="bar-2x" style="width: 0%;"></div>
+            </div>
+        </div>
+
+        <div class="sensi-bar">
+            <div class="sensi-label">
+                <span class="sensi-name">Mira 4x</span>
+                <span class="sensi-value" id="sensi-4x">0</span>
+            </div>
+            <div class="bar-container">
+                <div class="bar-fill" id="bar-4x" style="width: 0%;"></div>
+            </div>
+        </div>
+
+        <div class="sensi-bar">
+            <div class="sensi-label">
+                <span class="sensi-name">AWM / Sniper</span>
+                <span class="sensi-value" id="sensi-awm">0</span>
+            </div>
+            <div class="bar-container">
+                <div class="bar-fill" id="bar-awm" style="width: 0%;"></div>
+            </div>
+        </div>
+
+        <div class="sensi-bar">
+            <div class="sensi-label">
+                <span class="sensi-name">Full Capa</span>
+                <span class="sensi-value" id="sensi-fullcapa">0</span>
+            </div>
+            <div class="bar-container">
+                <div class="bar-fill" id="bar-fullcapa" style="width: 0%;"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- DPI Generation -->
+    <div class="section">
+        <div class="section-title">DPI Gerado (Opcional)</div>
+        <div class="dpi-display">
+            <div class="dpi-label" id="dpi-label">DPI Mobile</div>
+            <div class="dpi-value" id="dpi-value">---</div>
+        </div>
+    </div>
+
+
+    <!-- Main Action Button -->
+    <button class="main-button" id="generate-btn" onclick="generateConfiguration()">Gerar Configuração Perfeita</button>
+
+    <!-- Guide Panel: Dicas de Capa -->
+    <div class="guide-panel" id="guide-panel">
+        <div class="guide-header">
+            <div class="guide-header-content">
+                <div class="guide-title">Dicas de Capa</div>
+                <div class="guide-subtitle">Técnicas para melhorar headshots</div>
+            </div>
+            <button class="guide-close" onclick="closeGuidePanel()">
+                <svg viewBox="0 0 24 24">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <div class="guide-content">
+            <!-- Tip 1: Ajuste de Botão de Tiro -->
+            <div class="tip-card">
+                <div class="tip-header">
+                    <div class="tip-icon">
+                        <svg viewBox="0 0 24 24">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </div>
+                    <div class="tip-title">Ajuste de Botão de Tiro</div>
+                </div>
+                <div class="tip-content">
+                    Use um botão de tiro de tamanho <span class="tip-highlight">pequeno a médio</span> para maior
+                    precisão. Botões muito grandes reduzem o controle fino necessário para headshots consistentes.
+                </div>
+            </div>
+
+            <!-- Tip 2: Movimento de Mira -->
+            <div class="tip-card">
+                <div class="tip-header">
+                    <div class="tip-icon">
+                        <svg viewBox="0 0 24 24">
+                            <polyline points="18 15 12 9 6 15"></polyline>
+                            <line x1="12" y1="9" x2="12" y2="21"></line>
+                        </svg>
+                    </div>
+                    <div class="tip-title">Movimento de Mira</div>
+                </div>
+                <div class="tip-content">
+                    Faça um <span class="tip-highlight">arraste curto para cima</span> durante o disparo. O movimento
+                    deve ser controlado e suave, não agressivo. Pratique a consistência do movimento.
+                </div>
+            </div>
+
+            <!-- Tip 3: Sensibilidade Ideal -->
+            <div class="tip-card">
+                <div class="tip-header">
+                    <div class="tip-icon">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                    </div>
+                    <div class="tip-title">Sensibilidade Ideal</div>
+                </div>
+                <div class="tip-content">
+                    Evite valores extremos. <span class="tip-highlight">Estabilidade > Velocidade</span>. Deixe a
+                    sensibilidade gerada pelo app fazer o trabalho - ela já está otimizada para seu estilo.
+                </div>
+            </div>
+
+            <!-- Tip 4: Posição do Dedo -->
+            <div class="tip-card">
+                <div class="tip-header">
+                    <div class="tip-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path
+                                d="M12 2v6M12 18v4M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M18 12h4M4.93 19.07l4.24-4.24M14.83 9.17l4.24-4.24">
+                            </path>
+                        </svg>
+                    </div>
+                    <div class="tip-title">Posição do Dedo</div>
+                </div>
+                <div class="tip-content">
+                    Mantenha o dedo <span class="tip-highlight">relaxado</span> sobre o botão de tiro. Use a técnica de
+                    <span class="tip-highlight">toque + micro arraste</span> em vez de pressão forte.
+                </div>
+            </div>
+
+            <!-- Tip 5: Treino Recomendado -->
+            <div class="tip-card">
+                <div class="tip-header">
+                    <div class="tip-icon">
+                        <svg viewBox="0 0 24 24">
+                            <polygon
+                                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+                            </polygon>
+                        </svg>
+                    </div>
+                    <div class="tip-title">Treino Recomendado</div>
+                </div>
+                <div class="tip-content">
+                    Pratique no <span class="tip-highlight">modo treino</span> do Free Fire. Foque em <span
+                        class="tip-highlight">consistência, não velocidade</span>. Repita o movimento até se tornar
+                    automático.
+                </div>
+            </div>
+        </div>
+        <div class="guide-footer">
+            Dicas baseadas em práticas comuns de jogadores experientes.
+        </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div class="success-toast" id="success-toast">
+        <svg class="toast-icon" viewBox="0 0 24 24">
+            <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        Sensi full capa gerado
+    </div>
+
+    <!-- Block Screen (Purchase Required) -->
+    <div id="app-block-screen"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: white; z-index: 99999; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center;">
+        <img src="logo.png" alt="Ghost Sensi"
+            style="width: 120px; margin-bottom: 30px; filter: drop-shadow(0 0 15px rgba(255, 102, 196, 0.5));">
+        <h1 id="block-screen-title"
+            style="color: #ff66c4; font-size: 26px; font-weight: 900; margin-bottom: 20px; text-transform: uppercase;">
+            Período Grátis Acabou</h1>
+        <p id="block-screen-text"
+            style="color: #666; font-size: 16px; margin-bottom: 40px; line-height: 1.6; max-width: 400px;">
+            O período grátis acabou. Para liberar o app completo e ter acesso vitalício, é necessário pagar uma pequena
+            taxa. Clique no botão abaixo e será levado ao link do app:
+        </p>
+        <a id="purchase-link" href="https://www.ggcheckout.com/checkout/v3/LRR4T4h5VBYx5MmYOQep" target="_blank"
+            style="text-decoration: none; width: 100%; max-width: 320px; margin-bottom: 15px;">
+            <button
+                style="width: 100%; padding: 20px; background: linear-gradient(135deg, #ff66c4, #ff88d4); color: white; border: none; border-radius: 16px; font-size: 16px; font-weight: 800; cursor: pointer; box-shadow: 0 8px 24px rgba(255, 102, 196, 0.45); text-transform: uppercase; letter-spacing: 1px;">ADQUIRIR
+                ACESSO VITALÍCIO</button>
+        </a>
+        <button id="back-to-home" onclick="hideBlockScreen()"
+            style="background: transparent; border: none; color: #aaa; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: underline;">Voltar
+            para o Início</button>
+
+    </div>
+
+    <script>
+        let currentPlatform = 'mobile';
+        let currentProfile = 'media';
+        let selectedPlayer = 'Fantasma';
+
+        let customPlayers = JSON.parse(localStorage.getItem('customPlayers')) || [];
+        let sensiAttempts = parseInt(localStorage.getItem('sensiAttempts')) || 0;
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            // Payment Link
+            const purchaseUrl = "https://www.ggcheckout.com/checkout/v3/LRR4T4h5VBYx5MmYOQep";
+
+            // Apply the link to the button
+            const linkElement = document.getElementById('purchase-link');
+            if (linkElement) {
+                linkElement.href = purchaseUrl;
+            }
+
+            renderPlayerGrid();
+            checkAppLock();
+        });
+
+        function checkAppLock() {
+            if (sensiAttempts >= 3) {
+                const blockScreen = document.getElementById('app-block-screen');
+                if (blockScreen) blockScreen.style.display = 'flex';
+                // Show back button even if limit is reached
+                const backBtn = document.getElementById('back-to-home');
+                if (backBtn) backBtn.style.display = 'block';
+
+                // Lock core functions
+                const genBtn = document.getElementById('generate-btn');
+                if (genBtn) genBtn.classList.add('locked');
+
+                // Lock player grid items (including Add button)
+                document.querySelectorAll('.player-card').forEach(card => {
+                    card.classList.add('locked');
+                });
+
+                // Lock platform buttons
+                document.querySelectorAll('.platform-btn').forEach(btn => {
+                    btn.classList.add('locked');
+                });
+
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    const titleEl = item.querySelector('.menu-item-title');
+                    if (titleEl) {
+                        const title = titleEl.textContent;
+                        // Don't visually lock Otimizar/Dicas anymore as per request, just functionally check click
+                        if (title === 'Biblioteca') {
+                            // Keep library open
+                        } else {
+                            // Make them appear functional but keep the click action restricted
+                        }
+                    }
+                });
+            }
+        }
+
+        function hideBlockScreen() {
+            document.getElementById('app-block-screen').style.display = 'none';
+        }
+
+        function showLimitModal() {
+            // Forward to the absolute block screen
+            checkAppLock();
+        }
+
+        function renderPlayerGrid() {
+            const grid = document.getElementById('player-grid');
+            grid.innerHTML = '';
+
+            // Default Players
+            [
+                'Fantasma', 'Marechal', 'NOBRU', 'Cerol', 'Cauan7', 'Raone7',
+                'Two9', 'Ygorx', 'El Ghost', 'Ousado', 'Bak', 'Rekkon',
+                'Since', 'Syaz', 'VitinXP', 'Mob', 'Next', 'Noda',
+                'JAPABKR', 'Level Up', 'El Mito'
+            ].forEach(name => {
+                const card = document.createElement('div');
+                card.className = `player-card ${selectedPlayer === name ? 'selected' : ''}`;
+                card.textContent = name;
+                card.onclick = () => selectPlayer(card, name);
+                grid.appendChild(card);
+            });
+
+            // Custom Players
+            customPlayers.forEach((name, index) => {
+                const card = document.createElement('div');
+                card.className = `player-card custom ${selectedPlayer === name ? 'selected' : ''}`;
+                card.textContent = name;
+                card.onclick = () => selectPlayer(card, name);
+
+                const removeBtn = document.createElement('div');
+                removeBtn.className = 'remove-player-btn';
+                removeBtn.innerHTML = '&times;';
+                removeBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    removePlayer(index);
+                };
+                card.appendChild(removeBtn);
+                grid.appendChild(card);
+            });
+
+            // Add Player Button
+            const addBtn = document.createElement('div');
+            addBtn.className = 'player-card add-btn';
+            addBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Add
+            `;
+            addBtn.onclick = openAddPlayerModal;
+            grid.appendChild(addBtn);
+        }
+
+        function openAddPlayerModal() {
+            const modalHtml = `
+                <div class="modal-overlay active" id="add-player-modal">
+                    <div class="modal">
+                        <div class="modal-title">Novo Jogador</div>
+                        <div class="modal-subtitle">Digite o nome do jogador para adicionar</div>
+                        <input type="text" id="new-player-name" class="modal-input" placeholder="Ex: GHOST 07" autofocus>
+                        <div class="modal-actions">
+                            <button class="modal-btn cancel" onclick="closeModal('add-player-modal')">Cancelar</button>
+                            <button class="modal-btn confirm" onclick="savePlayer()">Adicionar</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            document.getElementById('new-player-name').focus();
+        }
+
+        function savePlayer() {
+            const input = document.getElementById('new-player-name');
+            const name = input.value.trim();
+            if (name) {
+                customPlayers.push(name);
+                localStorage.setItem('customPlayers', JSON.stringify(customPlayers));
+                closeModal('add-player-modal');
+                renderPlayerGrid();
+            }
+        }
+
+        function removePlayer(index) {
+            customPlayers.splice(index, 1);
+            localStorage.setItem('customPlayers', JSON.stringify(customPlayers));
+            renderPlayerGrid();
+        }
+
+        function openFPSModal() {
+            const blockScreen = document.getElementById('app-block-screen');
+            document.getElementById('block-screen-title').textContent = 'Ops! Função Bloqueada';
+            document.getElementById('block-screen-text').textContent = 'Ops, essa função está bloqueada! Para acessar ela, clique no botão abaixo:';
+            blockScreen.style.display = 'flex';
+            // Ensure the CTA button text is correct
+            const ctaBtn = document.querySelector('#app-block-screen a button');
+            if (ctaBtn) ctaBtn.textContent = 'ADQUIRIR GHOST SENSI';
+            // Show the back button
+            const backBtn = document.getElementById('back-to-home');
+            if (backBtn) backBtn.style.display = 'block';
+        }
+
+        function updateFPSPreview(val) {
+            document.getElementById('fps-preview').textContent = val + ' FPS';
+        }
+
+        function confirmFPS() {
+            const fps = document.getElementById('fps-range').value;
+            closeModal('fps-modal');
+
+            showToast(`FPS Otimizado para ${fps}!`);
+        }
+
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.remove();
+        }
+
+        function openLibraryModal() {
+            let history = [];
+            try {
+                const storedHistory = localStorage.getItem('sensiHistory');
+                history = storedHistory ? JSON.parse(storedHistory) : [];
+            } catch (e) {
+                console.error('Error loading history:', e);
+                history = [];
+            }
+
+            let historyHtml = '';
+
+            if (history.length === 0) {
+                historyHtml = '<div style="text-align: center; color: #999; padding: 20px;">Nenhuma sensi salva ainda.</div>';
+            } else {
+                history.reverse().forEach((item, index) => {
+                    historyHtml += `
+                        <div style="background: #fdfdfd; border-radius: 12px; padding: 15px; margin-bottom: 12px; border: 1px solid #ff66c433; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed #eee; padding-bottom: 8px;">
+                                <strong style="color: #ff66c4;">${item.player} (${item.platform})</strong>
+                                <span style="font-size: 11px; color: #aaa;">${item.date}</span>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 13px; color: #555;">
+                                <div>Geral: <strong style="color: #333;">${item.geral}</strong></div>
+                                <div>Red Dot: <strong style="color: #333;">${item.reddot}</strong></div>
+                                <div>Mira 2x: <strong style="color: #333;">${item.mira2x}</strong></div>
+                                <div>Mira 4x: <strong style="color: #333;">${item.mira4x}</strong></div>
+                                <div>AWM: <strong style="color: #333;">${item.awm}</strong></div>
+                                <div>Full Capa: <strong style="color: #ff66c4;">${item.fullcapa}</strong></div>
+                                <div style="grid-column: span 2; margin-top: 5px; padding-top: 5px; border-top: 1px solid #f5f5f5;">DPI: <strong style="color: #333;">${item.dpi}</strong></div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            const modalHtml = `
+                <div class="modal-overlay active" id="library-modal">
+                    <div class="modal" style="max-height: 80vh; overflow-y: auto;">
+                        <div class="modal-title">Biblioteca de Sensis</div>
+                        <div class="modal-subtitle">Suas configurações geradas</div>
+                        <div id="library-content">${historyHtml}</div>
+                        <div class="modal-actions" style="margin-top: 20px;">
+                            <button class="modal-btn confirm" onclick="closeModal('library-modal')">Fechar</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('success-toast');
+            if (!toast) return;
+            toast.innerHTML = `<svg class="toast-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg> ${message}`;
+            toast.classList.add('active');
+            setTimeout(() => {
+                toast.classList.remove('active');
+            }, 3000);
+        }
+
+        // Existing Draggable Menu Button logic
+        let isDragging = false;
+        let dragStarted = false;
+        let moveThreshold = 5;
+        let startX, startY;
+        let currentX, currentY;
+        let xOffset = 0;
+        let yOffset = 0;
+
+        const menuButton = document.querySelector('.menu-button');
+
+        menuButton.addEventListener('mousedown', dragStart);
+        menuButton.addEventListener('touchstart', dragStart);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('touchmove', drag);
+        document.addEventListener('mouseup', dragEnd);
+        document.addEventListener('touchend', dragEnd);
+
+        function dragStart(e) {
+            if (e.type === 'touchstart') {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+            } else {
+                startX = e.clientX;
+                startY = e.clientY;
+            }
+
+            initialX = startX - xOffset;
+            initialY = startY - yOffset;
+
+            if (e.target === menuButton || menuButton.contains(e.target)) {
+                isDragging = true;
+                dragStarted = false;
+            }
+        }
+
+        function drag(e) {
+            if (isDragging) {
+                let moveX, moveY;
+                if (e.type === 'touchmove') {
+                    moveX = e.touches[0].clientX;
+                    moveY = e.touches[0].clientY;
+                } else {
+                    moveX = e.clientX;
+                    moveY = e.clientY;
+                }
+
+                if (!dragStarted) {
+                    let distance = Math.sqrt(Math.pow(moveX - startX, 2) + Math.pow(moveY - startY, 2));
+                    if (distance > moveThreshold) {
+                        dragStarted = true;
+                        menuButton.classList.add('dragging');
+                    }
+                }
+
+                if (dragStarted) {
+                    e.preventDefault();
+                    currentX = moveX - initialX;
+                    currentY = moveY - initialY;
+                    xOffset = currentX;
+                    yOffset = currentY;
+                    setTranslate(currentX, currentY, menuButton);
+                }
+            }
+        }
+
+        function dragEnd(e) {
+            if (isDragging) {
+                if (dragStarted) {
+                    initialX = currentX;
+                    initialY = currentY;
+                    menuButton.classList.remove('dragging');
+                    setTimeout(() => { dragStarted = false; }, 0);
+                }
+                isDragging = false;
+            }
+        }
+
+        function setTranslate(xPos, yPos, el) {
+            requestAnimationFrame(() => {
+                el.style.transform = `translate3d(${xPos}px, calc(-50% + ${yPos}px), 0)`;
+            });
+        }
+
+        function toggleMenu() {
+            if (dragStarted) return;
+            const menu = document.getElementById('side-menu');
+            const overlay = document.getElementById('menu-overlay');
+            menu.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function closeMenu() {
+            const menu = document.getElementById('side-menu');
+            const overlay = document.getElementById('menu-overlay');
+            if (menu) menu.classList.remove('active');
+            if (overlay) overlay.classList.remove('active');
+        }
+
+        function openGuidePanel() {
+            const blockScreen = document.getElementById('app-block-screen');
+            document.getElementById('block-screen-title').textContent = 'Ops! Função Bloqueada';
+            document.getElementById('block-screen-text').textContent = 'Ops, essa função está bloqueada! Para acessar ela, clique no botão abaixo:';
+            blockScreen.style.display = 'flex';
+            // Ensure the CTA button text is correct
+            const ctaBtn = document.querySelector('#app-block-screen a button');
+            if (ctaBtn) ctaBtn.textContent = 'ADQUIRIR GHOST SENSI';
+            // Show the back button
+            const backBtn = document.getElementById('back-to-home');
+            if (backBtn) backBtn.style.display = 'block';
+        }
+
+        function closeGuidePanel() {
+            document.getElementById('guide-panel').classList.remove('active');
+        }
+
+        function selectPlatform(element, platform) {
+            if (sensiAttempts >= 3) return;
+            document.querySelectorAll('.platform-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            currentPlatform = platform;
+            const dpiLabel = document.getElementById('dpi-label');
+            dpiLabel.textContent = platform === 'mobile' ? 'DPI Mobile' : 'Mouse DPI';
+        }
+
+        function selectPlayer(element, name) {
+            if (sensiAttempts >= 3) return;
+            selectedPlayer = name;
+            document.querySelectorAll('.player-card').forEach(card => card.classList.remove('selected'));
+            element.classList.add('selected');
+        }
+
+        function generateConfiguration() {
+            if (sensiAttempts >= 3) {
+                checkAppLock();
+                return;
+            }
+
+            sensiAttempts++;
+            localStorage.setItem('sensiAttempts', sensiAttempts);
+
+            const max = 200;
+            const sensiGeral = Math.floor(Math.random() * (200 - 185 + 1)) + 185;
+            const sensiRedDot = Math.floor(Math.random() * (200 - 190 + 1)) + 190;
+            const sensi2x = Math.floor(Math.random() * (200 - 188 + 1)) + 188;
+            const sensi4x = Math.floor(Math.random() * (200 - 192 + 1)) + 192;
+            const sensiAWM = Math.floor(Math.random() * (100 - 85 + 1)) + 85;
+            const sensiFullCapa = Math.floor(Math.random() * (200 - 195 + 1)) + 195;
+
+            updateSensi('geral', sensiGeral, max);
+            updateSensi('reddot', sensiRedDot, max);
+            updateSensi('2x', sensi2x, max);
+            updateSensi('4x', sensi4x, max);
+            updateSensi('awm', sensiAWM, max);
+            updateSensi('fullcapa', sensiFullCapa, max);
+
+            const dpiValue = Math.floor(Math.random() * (2000 - 400 + 1)) + 400;
+            document.getElementById('dpi-value').textContent = dpiValue;
+
+            // Save to history
+            try {
+                const history = JSON.parse(localStorage.getItem('sensiHistory')) || [];
+                history.push({
+                    player: selectedPlayer || 'Fantasma',
+                    platform: currentPlatform || 'mobile',
+                    geral: sensiGeral,
+                    reddot: sensiRedDot,
+                    mira2x: sensi2x,
+                    mira4x: sensi4x,
+                    awm: sensiAWM,
+                    fullcapa: sensiFullCapa,
+                    dpi: dpiValue,
+                    date: new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+                });
+                // Keep only last 50
+                if (history.length > 50) history.shift();
+                localStorage.setItem('sensiHistory', JSON.stringify(history));
+            } catch (e) {
+                console.error('Error saving history:', e);
+            }
+
+            showToast('Sensi full capa gerado');
+
+            if (sensiAttempts >= 3) {
+                // Wait for the toast to be seen for a moment
+                setTimeout(checkAppLock, 1500);
+            }
+        }
+
+        function updateSensi(id, value, max) {
+            document.getElementById('sensi-' + id).textContent = value;
+            document.getElementById('bar-' + id).style.width = (value / max * 100) + '%';
+        }
+    </script>
+</body>
+
+</html>
